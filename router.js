@@ -190,8 +190,8 @@ router.get('/imageview', (req, res) => {
 router.post('/upload_multipart', (req, res) => {
   console.log('UPLOAD ROUTE HIT');
 
-  res.json({
-    result: 'route OK'
+  return res.status(200).json({
+    result: 'route OK 2026'
   });
 });
 
