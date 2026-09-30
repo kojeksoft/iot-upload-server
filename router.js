@@ -126,10 +126,14 @@ router.get('/', (req, res) => {
           .localeCompare(b.name.toLowerCase())
       );
 
+    const baseUrl =
+    req.baseUrl ||
+    (req.originalUrl.startsWith('/iot') ? '/iot' : '');
+
     return render(res, 'index.html', {
       files,
       folders: [],
-      base_url: req.baseUrl || '',
+      base_url: baseUrl,
       meta: {
         current_directory: UPLOAD_DIR
       }
