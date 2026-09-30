@@ -220,42 +220,11 @@ router.post(
 //
 // DELETE
 //
-router.post('/delete', (req, res) => {
-  const filename = req.body.filename;
-
-  if (!filename) {
-    return res.status(400).send('Filename is required');
-  }
-
-  const resolved = path.resolve(filename);
-  const uploadResolved = path.resolve(UPLOAD_DIR);
-
-  if (path.dirname(resolved) !== uploadResolved) {
-    return res.status(403).send(
-      env.render('no_permission.html')
-    );
-  }
-
-  if (!fs.existsSync(resolved)) {
-    return res.status(404).send(
-      env.render('not_found.html')
-    );
-  }
-
-  try {
-    fs.unlinkSync(resolved);
-
-    console.log(`Deleted: ${resolved}`);
-
-    return res.redirect(req.baseUrl || '/');
-
-  } catch (err) {
-    console.error(err);
-
-    return res.status(500).send(
-      'Failed to delete file'
-    );
-  }
+router.post('/upload_multipart', (req, res) => {
+  console.log('UPLOAD ROUTE HIT');
+  res.json({
+    result: 'route OK'
+  });
 });
 
 module.exports = router;
