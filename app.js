@@ -155,6 +155,14 @@ router.get('/imageview', (req, res) => {
   return res.render('no_permission.html');
 });
 
+app.get('/iot-test-ade', (req, res) => {
+  res.send('INI DARI IOT UPLOAD SERVER');
+});
+
+app.get('/iot/iot-test-ade', (req, res) => {
+  res.send('INI DARI IOT UPLOAD SERVER');
+});
+
 router.post(
   '/upload_multipart',
   upload.single('upfile'),
