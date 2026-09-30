@@ -1,0 +1,14 @@
+{
+  "name": "koppostel-iot-upload-server",
+  "version": "1.0.0",
+  "description": "Multipart upload server for KOPPOSTEL IoT devices",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "multer": "^2.0.2",
+    "nunjucks": "^3.2.4"
+  }
+}
