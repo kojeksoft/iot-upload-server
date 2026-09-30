@@ -18,7 +18,9 @@ if (!fs.existsSync(UPLOAD_DIR)) {
 
 // Nunjucks khusus module IoT
 const env = new nunjucks.Environment(
-  new nunjucks.FileSystemLoader(TEMPLATE_DIR),
+  new nunjucks.FileSystemLoader(TEMPLATE_DIR, {
+    noCache: true
+  }),
   {
     autoescape: true
   }
