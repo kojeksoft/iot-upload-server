@@ -5,6 +5,7 @@ const fs = require('fs');
 const nunjucks = require('nunjucks');
 
 const app = express();
+const router = express.Router();
 app.use(express.urlencoded({ extended: true }));
 
 const UPLOAD_DIR = path.join(__dirname, 'uploaded');
@@ -22,6 +23,7 @@ nunjucks.configure(TEMPLATE_DIR, {
 app.set('view engine', 'html');
 
 app.use('/uploaded', express.static(UPLOAD_DIR));
+app.use('/iot/uploaded', express.static(UPLOAD_DIR));
 
 function getMime(filename) {
   const ext = path.extname(filename).toLowerCase();
@@ -57,7 +59,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-app.get('/', (req, res) => {
+router.get('/', (req, res) => {
   const files = fs.readdirSync(UPLOAD_DIR)
     .filter(name => {
       return fs.statSync(path.join(UPLOAD_DIR, name)).isFile();
@@ -90,7 +92,7 @@ app.get('/', (req, res) => {
   });
 });
 
-app.get('/download', (req, res) => {
+router.get('/download', (req, res) => {
   const filename = req.query.filename;
 
   if (!filename) {
@@ -111,7 +113,7 @@ app.get('/download', (req, res) => {
   res.download(resolved);
 });
 
-app.get('/imageview', (req, res) => {
+router.get('/imageview', (req, res) => {
   const filename = req.query.filename;
   const rotate = parseInt(req.query.rotate || '0', 10);
 
@@ -134,7 +136,7 @@ app.get('/imageview', (req, res) => {
 
   if (mime.startsWith('image/')) {
     return res.render('view.html', {
-      user_image: `/uploaded/${path.basename(resolved)}`,
+      user_image: `${req.baseUrl}/uploaded/${path.basename(resolved)}`,
       rotate
     });
   }
@@ -153,7 +155,7 @@ app.get('/imageview', (req, res) => {
   return res.render('no_permission.html');
 });
 
-app.post(
+router.post(
   '/upload_multipart',
   upload.single('upfile'),
   (req, res) => {
@@ -174,7 +176,7 @@ app.post(
   }
 );
 
-app.post('/delete', (req, res) => {
+router.post('/delete', (req, res) => {
   const filename = req.body.filename;
 
   if (!filename) {
@@ -197,12 +199,15 @@ app.post('/delete', (req, res) => {
     fs.unlinkSync(resolved);
     console.log(`Deleted: ${resolved}`);
 
-    return res.redirect('/');
+    return res.redirect(req.baseUrl || '/');
   } catch (err) {
     console.error(err);
     return res.status(500).send('Failed to delete file');
   }
 });
+
+app.use('/', router);
+app.use('/iot', router);
 
 const PORT = process.env.PORT || 8080;
 
