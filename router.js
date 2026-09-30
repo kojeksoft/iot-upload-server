@@ -95,6 +95,7 @@ router.get('/', (req, res) => {
     return render(res, 'index.html', {
       files,
       folders: [],
+      base_url: req.baseUrl || '',
       meta: {
         current_directory: UPLOAD_DIR
       }
@@ -186,21 +187,32 @@ router.get('/imageview', (req, res) => {
 //
 router.post(
   '/upload_multipart',
-  upload.single('upfile'),
-  (req, res) => {
-    console.log('upload_multipart');
+  (req, res, next) => {
+    upload.single('upfile')(req, res, (err) => {
+      if (err) {
+        console.error('MULTER ERROR:', err);
+        return res.status(500).json({
+          result: 'upload FAIL',
+          error: err.message
+        });
+      }
 
-    if (!req.file) {
-      return res.status(400).json({
-        result: 'upload FAIL'
+      if (!req.file) {
+        console.error('NO FILE RECEIVED');
+        return res.status(400).json({
+          result: 'upload FAIL',
+          error: 'No file received'
+        });
+      }
+
+      console.log('UPLOAD OK');
+      console.log('Original:', req.file.originalname);
+      console.log('Saved:', req.file.path);
+      console.log('Size:', req.file.size);
+
+      return res.json({
+        result: 'upload OK'
       });
-    }
-
-    console.log(`Uploaded: ${req.file.originalname}`);
-    console.log(`Saved as: ${req.file.path}`);
-
-    return res.json({
-      result: 'upload OK'
     });
   }
 );
