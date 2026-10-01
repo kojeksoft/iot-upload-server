@@ -7,6 +7,7 @@ const fs = require('fs');
 const nunjucks = require('nunjucks');
 
 const router = express.Router();
+const BASE_URL = '/iot';
 
 const UPLOAD_DIR = path.join(__dirname, 'uploaded');
 const TEMPLATE_DIR = path.join(__dirname, 'templates');
@@ -133,7 +134,7 @@ router.get('/', (req, res) => {
     return render(res, 'index.html', {
       files,
       folders: [],
-      base_url: baseUrl,
+      base_url: BASE_URL,
       meta: {
         current_directory: UPLOAD_DIR
       }
@@ -202,7 +203,7 @@ router.get('/imageview', (req, res) => {
   if (mime.startsWith('image/')) {
     return render(res, 'view.html', {
       user_image:
-        `${req.baseUrl}/uploaded/${encodeURIComponent(
+        `${BASE_URL}/uploaded/${encodeURIComponent(
           path.basename(resolved)
         )}`,
       rotate
