@@ -267,7 +267,7 @@ router.post('/upload_multipart', (req, res) => {
 
     try {
       const waResponse = await fetch(
-        'http://70.153.146.55:3000/send',
+        'http://70.153.146.55/send',
         {
           method: 'POST',
           headers: {
