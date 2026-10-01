@@ -235,9 +235,13 @@ router.get('/imageview', (req, res) => {
 // MULTIPART UPLOAD
 // ==============================
 
+// ==============================
+// MULTIPART UPLOAD + WHATSAPP
+// ==============================
+
 router.post('/upload_multipart', (req, res) => {
 
-  upload.single('upfile')(req, res, (err) => {
+  upload.single('upfile')(req, res, async (err) => {
 
     if (err) {
       console.error('MULTER ERROR:', err);
@@ -249,25 +253,57 @@ router.post('/upload_multipart', (req, res) => {
     }
 
     if (!req.file) {
-      console.error('NO FILE RECEIVED');
-
       return res.status(400).json({
         result: 'upload FAIL',
         error: 'No file received'
       });
     }
 
-    console.log('UPLOAD OK');
-    console.log('Original filename:', req.file.originalname);
-    console.log('Saved filename:', req.file.filename);
-    console.log('Saved path:', req.file.path);
-    console.log('File size:', req.file.size);
+    console.log('UPLOAD OK:', req.file.filename);
 
-    return res.status(200).json({
-      result: 'upload OK',
-      filename: req.file.filename,
-      size: req.file.size
-    });
+    const imageUrl =
+      `https://koperasi.postel.go.id/iot/uploaded/${encodeURIComponent(req.file.filename)}`;
+
+    try {
+      const waResponse = await fetch(
+        'http://70.153.146.55:3000/send',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            phone: '6281286350002',
+            message: '🔔 Bell pintu rumah berbunyi',
+            imageUrl: imageUrl
+          })
+        }
+      );
+
+      const waResult = await waResponse.json();
+
+      console.log('WHATSAPP RESULT:', waResult);
+
+      return res.status(200).json({
+        result: 'upload OK',
+        filename: req.file.filename,
+        size: req.file.size,
+        whatsapp: waResult
+      });
+
+    } catch (waErr) {
+      console.error('WHATSAPP ERROR:', waErr);
+
+      return res.status(200).json({
+        result: 'upload OK',
+        filename: req.file.filename,
+        size: req.file.size,
+        whatsapp: {
+          result: 'FAIL',
+          error: waErr.message
+        }
+      });
+    }
 
   });
 
